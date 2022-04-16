@@ -1,0 +1,7 @@
+server:
+  ssl:
+    key-store: ./server/info/src/main/resources/info.p12
+    key-store-password: changeit
+    key-store-type: pkcs12
+    key-alias: info
+    key-password: changeit

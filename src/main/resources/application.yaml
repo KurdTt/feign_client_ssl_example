@@ -1,0 +1,12 @@
+# Konfiguracja poszczegolnych serwisow
+service:
+  info:
+    connectionTimeout: 3000
+    readTimeout: 3000
+    retries: 5
+    paths: localhost:8080,localhost:8081
+  status:
+    connectionTimeout: 100
+    readTimeout: 100
+    retries: 3
+    paths: localhost:8082,localhost:8083
