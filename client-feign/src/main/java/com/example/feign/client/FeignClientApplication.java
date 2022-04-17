@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan(basePackages = "com.example.feign.client")
 public class FeignClientApplication {
 
     public static void main(String[] args) {

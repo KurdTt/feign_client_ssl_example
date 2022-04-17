@@ -6,9 +6,14 @@ import feign.Request;
 import feign.RetryableException;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.util.ResourceUtils;
 
 public class InfoServiceConfiguration {
 
@@ -18,6 +23,21 @@ public class InfoServiceConfiguration {
 
     public InfoServiceConfiguration(InfoServiceServiceConfiguration infoServiceLoadBalancerConfiguration) {
         this.infoServiceLoadBalancerConfiguration = infoServiceLoadBalancerConfiguration;
+    }
+
+    @Bean
+    SSLSocketFactory getSSLSocketFactory() throws NoSuchAlgorithmException {
+        char[] allPassword = "changeit".toCharArray();
+        String truststorePath = "./client-feign/src/main/resources/certs.p12";
+        try {
+            return SSLContextBuilder
+                    .create()
+                    .loadKeyMaterial(ResourceUtils.getFile(truststorePath), allPassword, allPassword)
+                    .build()
+                    .getSocketFactory();
+        } catch (Exception e) {
+            return SSLContext.getDefault().getSocketFactory();
+        }
     }
 
     @Bean
