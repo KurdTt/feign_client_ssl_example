@@ -1,9 +1,11 @@
 package com.example.feign.client.status;
 
+import com.example.feign.client.common.CustomSSLFactory;
 import com.example.feign.client.common.ServiceServerListInstanceSupplier;
 import feign.Request;
 import feign.Retryer;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLSocketFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.loadbalancer.core.RandomLoadBalancer;
 import org.springframework.cloud.loadbalancer.core.ReactorLoadBalancer;
@@ -19,6 +21,13 @@ public class StatusServiceConfiguration {
 
     public StatusServiceConfiguration(StatusServiceServiceConfiguration statusServiceLoadBalancerConfiguration) {
         this.statusServiceLoadBalancerConfiguration = statusServiceLoadBalancerConfiguration;
+    }
+
+    @Bean
+    SSLSocketFactory getSSLSocketFactory() throws Exception {
+        char[] password = statusServiceLoadBalancerConfiguration.getTruststore().getPassword();
+        String truststorePath = statusServiceLoadBalancerConfiguration.getTruststore().getPath();
+        return CustomSSLFactory.create(truststorePath, password);
     }
 
     /**

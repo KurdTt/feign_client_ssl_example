@@ -1,23 +1,35 @@
 package com.example.feign.client.status;
 
 import com.example.feign.client.common.ServiceConfiguration;
+import com.example.feign.client.common.TruststoreData;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 @ConfigurationProperties("service.status")
 public class StatusServiceServiceConfiguration implements ServiceConfiguration {
 
+    private final TruststoreData truststore;
     private final long connectionTimeout;
     private final long readTimeout;
     private final int retries;
     private final String paths;
 
     @ConstructorBinding
-    public StatusServiceServiceConfiguration(long connectionTimeout, long readTimeout, int retries, String paths) {
+    public StatusServiceServiceConfiguration(TruststoreData truststore,
+                                             long connectionTimeout,
+                                             long readTimeout,
+                                             int retries,
+                                             String paths) {
+        this.truststore = truststore;
         this.connectionTimeout = connectionTimeout;
         this.readTimeout = readTimeout;
         this.retries = retries;
         this.paths = paths;
+    }
+
+    @Override
+    public TruststoreData getTruststore() {
+        return truststore;
     }
 
     @Override

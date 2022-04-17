@@ -1,19 +1,16 @@
 package com.example.feign.client.info;
 
+import com.example.feign.client.common.CustomSSLFactory;
 import com.example.feign.client.common.ServiceServerListInstanceSupplier;
 import feign.FeignException;
 import feign.Request;
 import feign.RetryableException;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.ResourceUtils;
 
 public class InfoServiceConfiguration {
 
@@ -26,19 +23,12 @@ public class InfoServiceConfiguration {
     }
 
     @Bean
-    SSLSocketFactory getSSLSocketFactory() throws NoSuchAlgorithmException {
-        char[] allPassword = "changeit".toCharArray();
-        String truststorePath = "./client-feign/src/main/resources/certs.p12";
-        try {
-            return SSLContextBuilder
-                    .create()
-                    .loadKeyMaterial(ResourceUtils.getFile(truststorePath), allPassword, allPassword)
-                    .build()
-                    .getSocketFactory();
-        } catch (Exception e) {
-            return SSLContext.getDefault().getSocketFactory();
-        }
+    SSLSocketFactory getSSLSocketFactory() throws Exception {
+        char[] password = infoServiceLoadBalancerConfiguration.getTruststore().getPassword();
+        String truststorePath = infoServiceLoadBalancerConfiguration.getTruststore().getPath();
+        return CustomSSLFactory.create(truststorePath, password);
     }
+
 
     @Bean
     ServiceInstanceListSupplier serviceStatusInstanceListSupplier() {

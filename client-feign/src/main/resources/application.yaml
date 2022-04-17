@@ -1,11 +1,17 @@
 # Konfiguracja poszczegolnych serwisow
 service:
   info:
+    truststore:
+      path: ./client-feign/src/main/resources/certs.p12
+      password: changeit
     connectionTimeout: 3000
     readTimeout: 3000
     retries: 5
     paths: localhost:8080,localhost:8081
   status:
+    truststore:
+      path: ./client-feign/src/main/resources/certs.p12
+      password: changeit
     connectionTimeout: 100
     readTimeout: 100
     retries: 3
