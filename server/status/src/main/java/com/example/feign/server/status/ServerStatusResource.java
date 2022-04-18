@@ -16,10 +16,10 @@ public class ServerStatusResource {
     @GetMapping("/status")
     public ResponseEntity<UUID> getTestMessage() {
         if (COUNTER % 3 == 0) {
-            log.info("Wywołanie {} status service", ++COUNTER);
+            log.info("Run {} status service", ++COUNTER);
             return ResponseEntity.ok(RESOURCE_ID);
         } else {
-            log.info("Wywołanie {} status service z błędem", ++COUNTER);
+            log.info("Run {} status service with exception", ++COUNTER);
             return ResponseEntity.internalServerError().body(null);
         }
     }

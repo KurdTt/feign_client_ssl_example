@@ -13,11 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
-/**
- * Domyślna konfiguracja dla laod balancera.
- * Klientow definiujemy adnotacją <code>@LoadBalancerClient</code>, która to ma własną konfigurację.
- * W przypadku braku przeciążenia danej konfiguracji, pobierana jest domyślna.
- */
 @Configuration
 @LoadBalancerClients({
         @LoadBalancerClient(name = InfoServiceConfiguration.SERVICE_NAME, configuration = InfoServiceConfiguration.class),

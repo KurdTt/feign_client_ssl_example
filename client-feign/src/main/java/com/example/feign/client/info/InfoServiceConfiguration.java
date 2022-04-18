@@ -78,19 +78,12 @@ public class InfoServiceConfiguration {
         );
     }
 
-    /**
-     * Funkcja przesłaniająca nam zachowanie w przypadku konkretnych statusów HTTP.
-     *
-     * @return Rzucany wyjątek. <code>RetryableException</code> powoduje, że łapiemy się w reguły
-     * Retryera, jeżeli to jest jakiś inny wyjątek to po prostu wywołanie jest jednokrotne.
-     */
     @Bean
     ErrorDecoder errorDecoder() {
         return (methodKey, response) -> {
             FeignException exception = FeignException.errorStatus(methodKey, response);
             if (exception.status() == 404 || exception.status() == 500) {
-                // Gdy jest 404 rzucamy RetryableException, który pozwala
-                // wznowić request tyle razy, ile wynosi getRetries
+                // Throw RetryableException, then Retryer can retry request N times
                 return new RetryableException(
                         response.status(),
                         exception.getMessage(),
@@ -100,7 +93,7 @@ public class InfoServiceConfiguration {
                         response.request()
                 );
             } else {
-                // Pozostałe kody procesujemy domyślnie
+                // Default for the rest
                 return exception;
             }
         };

@@ -53,10 +53,6 @@ public class StatusServiceConfiguration {
         return CustomSSLFactory.create(truststorePath, password);
     }
 
-    /**
-     * Przykładowe nadpisanie algorytmu dla konkretnego load balancera.
-     * W tym przypadku mamy random. Domyślnie jest round robin
-     */
     @Bean
     ReactorLoadBalancer<ServiceInstance> randomLoadBalancer(LoadBalancerClientFactory loadBalancerClientFactory) {
         return new RandomLoadBalancer(

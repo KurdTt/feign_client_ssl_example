@@ -9,9 +9,6 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import reactor.core.publisher.Flux;
 
-/**
- * Klasa dostarczająca listę dostępnych serwerów dla danego load balancera per usługa
- */
 public class ServiceServerListInstanceSupplier implements ServiceInstanceListSupplier {
 
     private final String serviceId;

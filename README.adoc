@@ -44,3 +44,5 @@ So, for sake of our test case, run:
 * Client on port 8090.
 
 Now, open Postman collection in `doc` folder and try to send message to client or directly to specific server.
+
+You can generate keys on Windows/Linux (it's very similar without deleting certs) with `generate_keys.bat` and change it for each endpoint.
