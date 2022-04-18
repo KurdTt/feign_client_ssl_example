@@ -23,7 +23,6 @@ public class CustomSSLFactory {
         try {
             return SSLContextBuilder
                     .create()
-                    //.loadKeyMaterial(ResourceUtils.getFile(truststorePath), allPassword, allPassword)
                     .loadTrustMaterial(ResourceUtils.getFile(path), password)
                     .build()
                     .getSocketFactory();

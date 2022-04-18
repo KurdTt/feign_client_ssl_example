@@ -4,8 +4,8 @@ service:
     truststore:
       path: ./client-feign/src/main/resources/certs.p12
       password: changeit
-    connectionTimeout: 3000
-    readTimeout: 3000
+    connectionTimeout: 500
+    readTimeout: 500
     retries: 5
     paths: localhost:8080,localhost:8081
   status:

@@ -2,16 +2,22 @@ package com.example.feign.client.status;
 
 import com.example.feign.client.common.CustomSSLFactory;
 import com.example.feign.client.common.ServiceServerListInstanceSupplier;
+import feign.Client;
 import feign.Request;
 import feign.Retryer;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.loadbalancer.core.RandomLoadBalancer;
 import org.springframework.cloud.loadbalancer.core.ReactorLoadBalancer;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
+import org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 public class StatusServiceConfiguration {
 
@@ -23,8 +29,25 @@ public class StatusServiceConfiguration {
         this.statusServiceLoadBalancerConfiguration = statusServiceLoadBalancerConfiguration;
     }
 
+
     @Bean
-    SSLSocketFactory getSSLSocketFactory() throws Exception {
+    @Primary
+    public Client feignClient(@Qualifier(SERVICE_NAME) Client client,
+                              LoadBalancerClient loadBalancerClient,
+                              LoadBalancerClientFactory loadBalancerClientFactory) {
+        return new FeignBlockingLoadBalancerClient(client, loadBalancerClient, loadBalancerClientFactory);
+    }
+
+    @Bean
+    @Qualifier(SERVICE_NAME)
+    Client sslClient(@Qualifier(SERVICE_NAME) SSLSocketFactory sslSocketFactory) {
+        return new Client.Default(sslSocketFactory, new NoopHostnameVerifier());
+    }
+
+
+    @Bean
+    @Qualifier(SERVICE_NAME)
+    SSLSocketFactory sslSocketFactory() throws Exception {
         char[] password = statusServiceLoadBalancerConfiguration.getTruststore().getPassword();
         String truststorePath = statusServiceLoadBalancerConfiguration.getTruststore().getPath();
         return CustomSSLFactory.create(truststorePath, password);
@@ -50,8 +73,8 @@ public class StatusServiceConfiguration {
     @Bean
     Retryer retryer() {
         return new Retryer.Default(
-                1000L,
-                1000L,
+                statusServiceLoadBalancerConfiguration.getReadTimeout(),
+                statusServiceLoadBalancerConfiguration.getReadTimeout(),
                 statusServiceLoadBalancerConfiguration.getRetries()
         );
     }

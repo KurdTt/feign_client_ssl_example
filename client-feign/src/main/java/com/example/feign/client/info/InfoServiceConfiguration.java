@@ -2,6 +2,7 @@ package com.example.feign.client.info;
 
 import com.example.feign.client.common.CustomSSLFactory;
 import com.example.feign.client.common.ServiceServerListInstanceSupplier;
+import feign.Client;
 import feign.FeignException;
 import feign.Request;
 import feign.RetryableException;
@@ -9,8 +10,14 @@ import feign.Retryer;
 import feign.codec.ErrorDecoder;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
+import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
+import org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 public class InfoServiceConfiguration {
 
@@ -23,7 +30,23 @@ public class InfoServiceConfiguration {
     }
 
     @Bean
-    SSLSocketFactory getSSLSocketFactory() throws Exception {
+    @Primary
+    public Client feignClient(@Qualifier(SERVICE_NAME) Client client,
+                              LoadBalancerClient loadBalancerClient,
+                              LoadBalancerClientFactory loadBalancerClientFactory) {
+        return new FeignBlockingLoadBalancerClient(client, loadBalancerClient, loadBalancerClientFactory);
+    }
+
+    @Bean
+    @Qualifier(SERVICE_NAME)
+    Client sslClient(@Qualifier(SERVICE_NAME) SSLSocketFactory sslSocketFactory) {
+        return new Client.Default(sslSocketFactory, new NoopHostnameVerifier());
+    }
+
+
+    @Bean
+    @Qualifier(SERVICE_NAME)
+    SSLSocketFactory sslSocketFactory() throws Exception {
         char[] password = infoServiceLoadBalancerConfiguration.getTruststore().getPassword();
         String truststorePath = infoServiceLoadBalancerConfiguration.getTruststore().getPath();
         return CustomSSLFactory.create(truststorePath, password);
@@ -38,8 +61,8 @@ public class InfoServiceConfiguration {
     @Bean
     Retryer retryer() {
         return new Retryer.Default(
-                1000L,
-                1000L,
+                infoServiceLoadBalancerConfiguration.getReadTimeout(),
+                infoServiceLoadBalancerConfiguration.getReadTimeout(),
                 infoServiceLoadBalancerConfiguration.getRetries()
         );
     }
@@ -65,7 +88,7 @@ public class InfoServiceConfiguration {
     ErrorDecoder errorDecoder() {
         return (methodKey, response) -> {
             FeignException exception = FeignException.errorStatus(methodKey, response);
-            if (exception.status() == 404) {
+            if (exception.status() == 404 || exception.status() == 500) {
                 // Gdy jest 404 rzucamy RetryableException, który pozwala
                 // wznowić request tyle razy, ile wynosi getRetries
                 return new RetryableException(
