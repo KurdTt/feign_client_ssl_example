@@ -1,8 +1,7 @@
-# Konfiguracja poszczegolnych serwisow
 service:
   info:
     truststore:
-      path: ./client-feign/src/main/resources/certs.p12
+      path: ./client-feign/src/main/resources/infocert.p12
       password: changeit
     connectionTimeout: 500
     readTimeout: 500
@@ -10,7 +9,7 @@ service:
     paths: localhost:8080,localhost:8081
   status:
     truststore:
-      path: ./client-feign/src/main/resources/certs.p12
+      path: ./client-feign/src/main/resources/statuscert.p12
       password: changeit
     connectionTimeout: 100
     readTimeout: 100
