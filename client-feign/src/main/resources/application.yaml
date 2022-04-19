@@ -1,5 +1,6 @@
 service:
   info:
+    secured: true
     truststore:
       path: ./client-feign/src/main/resources/infocert.p12
       password: changeit
@@ -8,6 +9,7 @@ service:
     retries: 5
     paths: localhost:8080,localhost:8081
   status:
+    secured: true
     truststore:
       path: ./client-feign/src/main/resources/statuscert.p12
       password: changeit

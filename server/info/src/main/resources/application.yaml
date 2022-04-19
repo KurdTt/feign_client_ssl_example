@@ -5,3 +5,4 @@ server:
     key-store-type: pkcs12
     key-alias: info
     key-password: changeit
+    enabled: true

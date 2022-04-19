@@ -44,18 +44,22 @@ public class InfoServiceConfiguration {
     @Bean
     @Qualifier(SERVICE_NAME)
     Client sslClient() throws Exception {
-        char[] password = infoServiceLoadBalancerConfiguration.getTruststore().getPassword();
-        String truststorePath = infoServiceLoadBalancerConfiguration.getTruststore().getPath();
-        SSLContext sslContext = SSLContextBuilder.create()
-                .loadTrustMaterial(ResourceUtils.getFile(truststorePath), password)
-                .build();
-        CloseableHttpClient closeableHttpClient = HttpClientBuilder
-                .create()
-                .useSystemProperties()
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .build();
-        return new ApacheHttpClient(closeableHttpClient);
+        if (infoServiceLoadBalancerConfiguration.isSecured()) {
+            char[] password = infoServiceLoadBalancerConfiguration.getTruststore().getPassword();
+            String truststorePath = infoServiceLoadBalancerConfiguration.getTruststore().getPath();
+            SSLContext sslContext = SSLContextBuilder.create()
+                    .loadTrustMaterial(ResourceUtils.getFile(truststorePath), password)
+                    .build();
+            CloseableHttpClient closeableHttpClient = HttpClientBuilder
+                    .create()
+                    .useSystemProperties()
+                    .setSSLContext(sslContext)
+                    .setSSLHostnameVerifier(new NoopHostnameVerifier())
+                    .build();
+            return new ApacheHttpClient(closeableHttpClient);
+        } else {
+            return new ApacheHttpClient();
+        }
     }
 
     @Bean

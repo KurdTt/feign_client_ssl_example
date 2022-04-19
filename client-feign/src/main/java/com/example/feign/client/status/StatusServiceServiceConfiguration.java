@@ -14,17 +14,21 @@ public class StatusServiceServiceConfiguration implements ServiceConfiguration {
     private final int retries;
     private final String paths;
 
+    private final boolean secured;
+
     @ConstructorBinding
     public StatusServiceServiceConfiguration(TruststoreData truststore,
                                              long connectionTimeout,
                                              long readTimeout,
                                              int retries,
-                                             String paths) {
+                                             String paths,
+                                             boolean secured) {
         this.truststore = truststore;
         this.connectionTimeout = connectionTimeout;
         this.readTimeout = readTimeout;
         this.retries = retries;
         this.paths = paths;
+        this.secured = secured;
     }
 
     @Override
@@ -50,5 +54,10 @@ public class StatusServiceServiceConfiguration implements ServiceConfiguration {
     @Override
     public int getRetries() {
         return retries;
+    }
+
+    @Override
+    public boolean isSecured() {
+        return secured;
     }
 }

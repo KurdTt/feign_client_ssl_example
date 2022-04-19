@@ -10,4 +10,6 @@ public interface ServiceConfiguration {
     long getReadTimeout();
 
     int getRetries();
+
+    boolean isSecured();
 }

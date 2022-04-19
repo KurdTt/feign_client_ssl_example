@@ -38,6 +38,6 @@ public class ServiceServerListInstanceSupplier implements ServiceInstanceListSup
         String host = parts[0].trim();
         int port = Integer.parseInt(parts[1].trim());
         String id = UUID.randomUUID().toString();
-        return new DefaultServiceInstance(id, serviceId, host, port, true);
+        return new DefaultServiceInstance(id, serviceId, host, port, serviceConfiguration.isSecured());
     }
 }
