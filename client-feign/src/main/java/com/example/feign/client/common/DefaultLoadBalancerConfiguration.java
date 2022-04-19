@@ -6,12 +6,10 @@ import feign.Request;
 import feign.Retryer;
 import java.util.concurrent.TimeUnit;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClient;
 import org.springframework.cloud.loadbalancer.annotation.LoadBalancerClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 @LoadBalancerClients({
@@ -19,13 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
         @LoadBalancerClient(name = StatusServiceConfiguration.SERVICE_NAME, configuration = StatusServiceConfiguration.class)
 })
 public class DefaultLoadBalancerConfiguration {
-
-    @Bean
-    @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
-    }
-
     @Bean
     @ConditionalOnMissingBean
     Retryer retryer() {

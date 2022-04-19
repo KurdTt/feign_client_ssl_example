@@ -1,6 +1,5 @@
 package com.example.feign.client.info;
 
-import com.example.feign.client.common.CustomSSLFactory;
 import com.example.feign.client.common.ServiceServerListInstanceSupplier;
 import feign.Client;
 import feign.FeignException;
@@ -8,9 +7,13 @@ import feign.Request;
 import feign.RetryableException;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
+import feign.httpclient.ApacheHttpClient;
 import java.util.concurrent.TimeUnit;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
@@ -18,6 +21,7 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.util.ResourceUtils;
 
 public class InfoServiceConfiguration {
 
@@ -39,19 +43,20 @@ public class InfoServiceConfiguration {
 
     @Bean
     @Qualifier(SERVICE_NAME)
-    Client sslClient(@Qualifier(SERVICE_NAME) SSLSocketFactory sslSocketFactory) {
-        return new Client.Default(sslSocketFactory, new NoopHostnameVerifier());
-    }
-
-
-    @Bean
-    @Qualifier(SERVICE_NAME)
-    SSLSocketFactory sslSocketFactory() throws Exception {
+    Client sslClient() throws Exception {
         char[] password = infoServiceLoadBalancerConfiguration.getTruststore().getPassword();
         String truststorePath = infoServiceLoadBalancerConfiguration.getTruststore().getPath();
-        return CustomSSLFactory.create(truststorePath, password);
+        SSLContext sslContext = SSLContextBuilder.create()
+                .loadTrustMaterial(ResourceUtils.getFile(truststorePath), password)
+                .build();
+        CloseableHttpClient closeableHttpClient = HttpClientBuilder
+                .create()
+                .useSystemProperties()
+                .setSSLContext(sslContext)
+                .setSSLHostnameVerifier(new NoopHostnameVerifier())
+                .build();
+        return new ApacheHttpClient(closeableHttpClient);
     }
-
 
     @Bean
     ServiceInstanceListSupplier serviceStatusInstanceListSupplier() {
