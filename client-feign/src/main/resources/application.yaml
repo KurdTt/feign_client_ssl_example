@@ -3,6 +3,7 @@ service:
     secured: true
     truststore:
       path: ./client-feign/src/main/resources/infocert.p12
+      alias: info
       password: changeit
     connectionTimeout: 500
     readTimeout: 500
@@ -12,6 +13,7 @@ service:
     secured: true
     truststore:
       path: ./client-feign/src/main/resources/statuscert.p12
+      alias: status
       password: changeit
     connectionTimeout: 100
     readTimeout: 100

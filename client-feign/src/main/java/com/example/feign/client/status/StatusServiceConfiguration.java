@@ -72,7 +72,9 @@ public class StatusServiceConfiguration {
             char[] password = statusServiceLoadBalancerConfiguration.getTruststore().getPassword();
             File truststore = ResourceUtils.getFile(truststorePath);
             KeyStore keyStore = KeyStore.getInstance(truststore, password);
-            X509Certificate certificate = (X509Certificate) keyStore.getCertificate("status");
+            X509Certificate certificate = (X509Certificate) keyStore.getCertificate(
+                    statusServiceLoadBalancerConfiguration.getTruststore().getAlias()
+            );
             return new HandshakeCertificates.Builder()
                     .addTrustedCertificate(certificate)
                     .build()

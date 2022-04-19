@@ -13,15 +13,21 @@ package com.example.feign.client.common;
 
 public class TruststoreData {
     private final String path;
+    private final String alias;
     private final char[] password;
 
-    public TruststoreData(String path, char[] password) {
+    public TruststoreData(String path, String alias, char[] password) {
         this.path = path;
+        this.alias = alias;
         this.password = password;
     }
 
     public String getPath() {
         return path;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
     public char[] getPassword() {
